@@ -1,5 +1,6 @@
 package com.example.viemedtodolist.data
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.viemedtodolist.networking.RequestErrorAction
@@ -18,6 +19,7 @@ object TasksRepository {
     private var isLoading = MutableLiveData<Boolean>()
     private var requestErrorAction = MutableLiveData<RequestErrorAction>()
 
+    private val LOG_TAG = "Request exception"
 
     init {
         tasks.value = taskList
@@ -50,8 +52,9 @@ object TasksRepository {
         val task = taskList.find { task -> task.id == id }!!
         task.isDone = !task.isDone
         tasks.value = taskList
-        VMApolloClient.updateTaskStatus(id, task.isDone) { isDone, exception ->
-            if (exception != null) {
+        VMApolloClient.updateTaskStatus(id, task.isDone) { _, exception ->
+            exception?.let {
+                Log.d(LOG_TAG, it.toString())
                 requestErrorAction.postValue(RequestErrorAction.UPDATE)
             }
         }
@@ -59,13 +62,15 @@ object TasksRepository {
 
     fun createTask(name: String, note: String, isDone: Boolean) {
         isLoading.value = true
-        VMApolloClient.createTask(name, note, isDone) { task, exeption ->
+        VMApolloClient.createTask(name, note, isDone) { task, exception ->
             isLoading.postValue(false)
             if (task != null) {
                 addTask(task)
             } else {
                 requestErrorAction.postValue(RequestErrorAction.CREATE)
             }
+
+            exception?.let { Log.d(LOG_TAG, it.toString()) }
         }
     }
 
@@ -78,6 +83,7 @@ object TasksRepository {
                 requestErrorAction.postValue(RequestErrorAction.DELETE)
             }
 
+            exception?.let { Log.d(LOG_TAG, it.toString()) }
         }
     }
 

@@ -27,7 +27,7 @@ class TasksActivity : AppCompatActivity() {
 
         setTasksObserver()
         setRequestErrorObserver()
-        new_task.setOnClickListener { view ->
+        new_task.setOnClickListener {
             AddTaskDialog.show(supportFragmentManager)
         }
     }
