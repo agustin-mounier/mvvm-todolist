@@ -1,0 +1,44 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/vm_light_blue</item>
+    </style>
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="EmptyState"/>
+    <style name="EmptyState.Text">
+        <item name="android:fontFamily">@font/avenir_roman</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/vm_light_grey</item>
+    </style>
+
+    <style name="DialogFragmentTheme">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+    </style>
+
+    <style name="Task">
+        <item name="android:fontFamily">@font/avenir_roman</item>
+    </style>
+    <style name="Task.Name">
+        <item name="android:textSize">18dp</item>
+    </style>
+    <style name="Task.Note">
+        <item name="android:textSize">14dp</item>
+    </style>
+    <style name="ViemedCheckBox">
+        <item name="android:buttonTint">@color/vm_light_blue</item>
+        <item name="android:layout_height">30dp</item>
+        <item name="android:layout_width">30dp</item>
+    </style>
+</resources>

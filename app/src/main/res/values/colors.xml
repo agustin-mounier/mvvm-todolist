@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="vm_light_grey">#637381</color>
+    <color name="vm_light_blue">#587bf6</color>
+    <color name="vm_light_white">#f5f6f7</color>
+    <color name="vm_transparent_blue">#2d4bef</color>
+    <color name="grey_overlay">#80000000</color>
+</resources>
