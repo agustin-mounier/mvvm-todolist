@@ -7,7 +7,7 @@ import com.example.viemedtodolist.networking.TasksService
 /**
  * Tasks repository that acts as a single source of truth for all the app data.
  * It doesn't persists the data as its easily obtainable for the scope of this sample project,
- * however if you'd like to see a Room implementation for in phone persistence I'm happy to do it.
+ * however there is a room implementation of the repository in class TasksLocalRepository.
  */
 object TasksRepository {
 

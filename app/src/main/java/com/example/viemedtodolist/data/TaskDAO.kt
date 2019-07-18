@@ -1,5 +1,6 @@
 package com.example.viemedtodolist.data
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 
 /**
@@ -18,5 +19,5 @@ interface TaskDAO {
     fun updateTask(task: Task)
 
     @Query("SELECT * FROM tasks_table")
-    fun getAllTasks(): List<Task>
+    fun getAllTasks(): LiveData<List<Task>>
 }
