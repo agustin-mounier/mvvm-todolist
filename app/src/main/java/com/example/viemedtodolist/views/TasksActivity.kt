@@ -8,9 +8,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.viemedtodolist.*
+import com.example.viemedtodolist.R
 import com.example.viemedtodolist.data.Task
-import com.example.viemedtodolist.networking.RequestErrorAction
+import com.example.viemedtodolist.networking.RequestAction
 import com.example.viemedtodolist.viewmodels.TasksViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -46,10 +46,10 @@ class TasksActivity : AppCompatActivity() {
     private fun setRequestErrorObserver() {
         viewModel.getResquestErrorAction().observe(this, Observer { requestErrorAction ->
             var errorMessage: String? = null
-            when(requestErrorAction) {
-                RequestErrorAction.DELETE -> errorMessage = "Error deleting task"
-                RequestErrorAction.CREATE -> errorMessage = "Error creating task"
-                RequestErrorAction.UPDATE -> errorMessage = "Error updating task"
+            when (requestErrorAction) {
+                RequestAction.DELETE -> errorMessage = "Error deleting task"
+                RequestAction.CREATE -> errorMessage = "Error creating task"
+                RequestAction.UPDATE -> errorMessage = "Error updating task"
             }
             errorMessage?.let { Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show() }
         })

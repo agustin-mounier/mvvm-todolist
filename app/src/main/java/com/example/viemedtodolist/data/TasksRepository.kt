@@ -20,7 +20,7 @@ object TasksRepository {
     }
 
     fun isLoading() = tasksService.isLoading()
-
+    
     fun getTasks() = tasks as LiveData<List<Task>> //Cast to prevent modifications
 
     fun getNetworkError() = tasksService.getNetworkError()

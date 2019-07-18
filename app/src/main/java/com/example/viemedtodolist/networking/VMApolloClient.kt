@@ -1,6 +1,6 @@
 package com.example.viemedtodolist.networking
 
-import com.apollographql.apollo.ApolloCall
+import com.apollographql.apollo.ApolloCall.Callback
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Response
 import com.apollographql.apollo.exception.ApolloException
@@ -27,8 +27,8 @@ import kotlin.coroutines.suspendCoroutine
  * triggered with that request code.
  *
  * I thought about implementing an Interceptor that makes the api call and set the access token but to my surprise the Apollo Client
- * doesn't provide a method for synchronous request (don't know why) which are required for this approach. This is tricky
- * because you have to exclude from the interceptor the call that generates de access token (otherwise it starts looping).
+ * doesn't provide a method for synchronous request (don't know why) which are required for this approach. This is why I had to
+ * implement a synchronous request for the access token with coroutines.
  */
 object VMApolloClient : CoroutineScope {
     private val job = Job()
@@ -40,8 +40,8 @@ object VMApolloClient : CoroutineScope {
     private const val USER_NAME = "amounier"
     private const val API_KEY = "57083757-2476-4f5e-8d2b-66a9d07fdb21"
 
-    private var accessToken: String? = null
     private val apolloClient: ApolloClient
+    private var accessToken: String? = null
     private var fetchingAccessToken = false
 
 
@@ -60,63 +60,23 @@ object VMApolloClient : CoroutineScope {
             .okHttpClient(okHttpClient).build()
     }
 
-    fun getAllTasks(callback: (List<Task>?, ApolloException?) -> Unit) {
-        apolloClient.query(AllTasksQuery.builder().build()).enqueue(
-            object : ApolloCall.Callback<AllTasksQuery.Data>() {
-                override fun onFailure(e: ApolloException) {
-                    callback(null, e)
-
-                }
-
-                override fun onResponse(response: Response<AllTasksQuery.Data>) {
-                    val data = response.data() as AllTasksQuery.Data
-                    val taskList = transformToTaskList(data.allTasks()!!)
-                    callback(taskList, null)
-                }
-
-            }
-        )
+    fun getAllTasks(callback: Callback<AllTasksQuery.Data>) {
+        apolloClient.query(AllTasksQuery.builder().build()).enqueue(callback)
     }
 
-    fun createTask(name: String, note: String, isDone: Boolean, callback: (Task?, ApolloException?) -> Unit) {
+    fun createTask(name: String, note: String, isDone: Boolean, callback: Callback<CreateTaskMutation.Data>) {
         val createTaskMutation = CreateTaskMutation.builder().name(name).note(note).isDone(isDone).build()
-        apolloClient.mutate(createTaskMutation).enqueue(object : ApolloCall.Callback<CreateTaskMutation.Data>() {
-            override fun onFailure(e: ApolloException) {
-                callback(null, e)
-            }
-
-            override fun onResponse(response: Response<CreateTaskMutation.Data>) {
-                callback(transformToTask(response.data()!!.createTask()!!), null)
-            }
-        })
+        apolloClient.mutate(createTaskMutation).enqueue(callback)
     }
 
-    fun deleteTask(id: String, callback: (Boolean?, ApolloException?) -> Unit) {
+    fun deleteTask(id: String, callback: Callback<DeleteTaskMutation.Data>) {
         val deleteTaskMutation = DeleteTaskMutation.builder().id(id).build()
-        apolloClient.mutate(deleteTaskMutation).enqueue(object : ApolloCall.Callback<DeleteTaskMutation.Data>() {
-            override fun onFailure(e: ApolloException) {
-                callback(null, e)
-            }
-
-            override fun onResponse(response: Response<DeleteTaskMutation.Data>) {
-                callback(response.data()!!.deleteTask(), null)
-            }
-
-        })
+        apolloClient.mutate(deleteTaskMutation).enqueue(callback)
     }
 
-    fun updateTaskStatus(id: String, isDone: Boolean, callback: (Boolean?, ApolloException?) -> Unit) {
+    fun updateTaskStatus(id: String, isDone: Boolean, callback: Callback<UpdateTaskStatusMutation.Data>) {
         val updateTaskStatusMutation = UpdateTaskStatusMutation.builder().id(id).isDone(isDone).build()
-        apolloClient.mutate(updateTaskStatusMutation).enqueue(
-            object : ApolloCall.Callback<UpdateTaskStatusMutation.Data>() {
-                override fun onFailure(e: ApolloException) {
-                    callback(null, e)
-                }
-
-                override fun onResponse(response: Response<UpdateTaskStatusMutation.Data>) {
-                    callback(response.data()?.updateTaskStatus()?.isDone, null)
-                }
-            })
+        apolloClient.mutate(updateTaskStatusMutation).enqueue(callback)
     }
 
     private fun generateAccessToken() {
@@ -134,7 +94,7 @@ object VMApolloClient : CoroutineScope {
         fetchingAccessToken = true
         val accessTokenMutation = GenerateAccessTokenMutation.builder().apiKey(API_KEY).userName(USER_NAME).build()
         apolloClient.mutate(accessTokenMutation).enqueue(
-            object : ApolloCall.Callback<GenerateAccessTokenMutation.Data>() {
+            object : Callback<GenerateAccessTokenMutation.Data>() {
                 override fun onFailure(e: ApolloException) {
                     cont.resume(null)
                 }
@@ -147,23 +107,27 @@ object VMApolloClient : CoroutineScope {
     }
 
 
-    class AccessTokenInterceptor : Interceptor {
+    private class AccessTokenInterceptor : Interceptor {
         override fun intercept(chain: Interceptor.Chain): okhttp3.Response {
             val original = chain.request()
             val builder = original.newBuilder().method(original.method(), original.body())
             generateAccessToken()
             if (!accessToken.isNullOrEmpty()) {
-                builder.header("Authorization", accessToken)
+                builder.header("Authorization", accessToken!!)
             }
             return chain.proceed(builder.build())
         }
     }
 
-    private fun transformToTaskList(allTaskList: List<AllTasksQuery.AllTask>) = allTaskList.map {
+    /**
+     * Apollo should have the option to set the return type of the data, sadly this is not an option.
+     * The transformation IMO should be the clients responsibility so that's why this functions are here.
+     */
+    fun transformToTaskList(allTaskList: List<AllTasksQuery.AllTask>) = allTaskList.map {
         Task(it.id(), it.name(), it.note(), it.isDone)
     }
 
-    private fun transformToTask(createdTask: CreateTaskMutation.CreateTask): Task {
+    fun transformToTask(createdTask: CreateTaskMutation.CreateTask): Task {
         return Task(createdTask.id(), createdTask.name(), createdTask.note(), createdTask.isDone)
     }
 }

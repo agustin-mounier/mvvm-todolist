@@ -1,6 +1,6 @@
 package com.example.viemedtodolist.networking
 
-enum class RequestErrorAction {
+enum class RequestAction {
     NONE,
     CREATE,
     UPDATE,
