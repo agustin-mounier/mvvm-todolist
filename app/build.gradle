@@ -1,12 +1,8 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
-
 apply plugin: 'com.apollographql.android'
-
-apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-kapt' //Kotlin Annotation Processing Tool
 
 android {
     compileSdkVersion 28
@@ -45,31 +41,29 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
-    kapt "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
+    kapt           "androidx.lifecycle:lifecycle-extensions:$archLifecycleVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.annotation:annotation:$androidXAnnotations"
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation "com.google.android.material:material:$materialVersion"
+
+    //Room
     implementation "androidx.room:room-runtime:$room_version"
-    kapt "androidx.room:room-runtime:$room_version"
-    implementation "android.arch.persistence.room:runtime:1.1.1"
-    kapt "android.arch.persistence.room:compiler:1.1.1"
+    kapt           "androidx.room:room-runtime:$room_version"
 
-    implementation 'com.google.android.material:material:1.0.0'
-
+    //Apollo GraphQL + OkHttp
     implementation "com.apollographql.apollo:apollo-runtime:$apolloVersion"
     implementation "com.apollographql.apollo:apollo-android-support:$apolloVersion"
+    implementation "com.squareup.okhttp3:okhttp:$okHttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okHttpVersion"
 
+    //Kotlin Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
 
-    compileOnly 'org.jetbrains:annotations:13.0'
-    testCompileOnly 'org.jetbrains:annotations:13.0'
-
-    implementation 'com.squareup.okhttp3:okhttp:3.14.2'
-    implementation "com.squareup.okhttp3:logging-interceptor:3.14.2"
-
+    //Testing
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.mockito:mockito-core:2.+"
-    testImplementation 'org.robolectric:robolectric:4.3'
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
